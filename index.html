@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>MY EDIT VIDEO</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #350053, hsl(266, 100%, 13%)); /* グラデーション背景　*/
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      display: flex;
+      flex-wrap: wrap;       /* 折り返しを許可 */
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+      transition: background 400s;
+    }
+      
+       /* 夜モード時の背景 */
+    body.night {
+      background: radial-gradient(ellipse at center, #0a0033 60%, #000 100%);
+    }
+/*==========   雷   ============*/
+ /* ===== 背景キャンバス ===== */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: -1;
+      pointer-events: none; /* 背景クリックを無効化 */
+       filter: blur(5px); /* 🔹背景全体をソフトフォーカス */
+    }
+
+    /* 順序 (下から上) */
+    #stars { z-index: -4; }
+    #clouds { z-index: -3; }
+    #lightning { z-index: -2; }
+    #flash { z-index: -1; }
+    #rain { z-index: -3; }
+
+
+
+
+  h1 {
+    font-size: 2.5em;
+    margin-top: 100px;
+    text-shadow: 0 0 15px #fff, 0 0 30px #66f;
+  }
+  p {
+    font-size: 1.2em;
+    max-width: 800px;
+    margin: 40px auto;
+    line-height: 1.8;
+  }
+    
+  
+
+    h1 {
+      width: 100%;  
+      text-align: center;
+      color: rgb(0, 0, 0);
+      text-shadow: 10px 10px 10px rgb(119, 0, 119);
+      margin-bottom: 20px;
+      background-color: #170024;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.1);
+    }
+     /* ====== レイアウト部分 ====== */
+    .video-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+        h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      width: 100%;
+      font-size: 23px;
+      text-shadow:
+    0 0 5px rgb(255, 0, 255),
+    0 0 10px rgb(255, 0, 234),
+    0 0 20px rgb(255, 0, 242),
+    0 0 40px rgb(255, 0, 255);
+}
+ /* 雪を降らす範囲 */
+   
+ .snow {
+      position: fixed;
+      top: -30px;
+      font-size: 24px;
+      color: #8df2ff;
+      animation: fall linear forwards;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fall  {
+      0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+      50%  { transform: translateY(50vh) translateX(-30px) rotate(20deg); }
+      100% { transform: translateY(100vh) translateX(30px) rotate(-20deg); opacity: 0; }
+    }
+
+    /* 蝶々 */
+
+    .normal {
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+    }
+
+    /* 🦋 蝶セクション（背景は変えない） */
+    .butterfly-section {
+      background: #ffe6f0; /* 蝶の雰囲気に合う淡い色 */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .butterfly {
+      position: fixed;
+      font-size: 2rem;
+      opacity: 0;
+      transform: translateX(-100px) rotate(0deg);
+      animation: fly 6s linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fly {
+      0% {
+        opacity: 0;
+        transform: translateX(-100px) translateY(0) rotate(0deg);
+      }
+      10% { opacity: 1; }
+      50% { transform: translateX(50vw) translateY(-50px) rotate(20deg); }
+      100% {
+        opacity: 0;
+        transform: translateX(100vw) translateY(-100px) rotate(-20deg);
+      }
+    }
+
+    /* ====== 月と星 ====== */
+  
+    /* 星空レイヤー */
+    #stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
+      animation: moveStars 100s linear infinite;
+      transition: opacity 2s ease;
+    }
+    body.night #stars {
+      opacity: 0.7;
+    }
+
+    @keyframes moveStars {
+      from { transform: translateY(0); }
+      to   { transform: translateY(100px); }
+    }
+
+    /*   ハート　　 */ 
+
+.heart{
+      position: fixed;
+      top: -30px;
+      font-size: 24px;
+      color: #ff101c;
+      animation: fall linear forwards;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fall  {
+      0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+      50%  { transform: translateY(50vh) translateX(-30px) rotate(20deg); }
+      100% { transform: translateY(100vh) translateX(30px) rotate(-20deg); opacity: 0; }
+    }
+
+    /* ====== ビデオカード部分 ====== */
+
+    .video-card {
+      background: rgb(87, 0, 82);
+      border-radius: 10px;
+      border-style :unset;
+      border: 2px solid rgb(255, 0, 255);
+      padding: 10px;
+      margin: 10px;
+      box-shadow:  3px 3px 5px;
+      text-align: center;
+      width: 45%;            /* スマホでは1列 */
+      max-width: 400px;
+    
+    } 
+    .cinema-card {
+      background: rgb(87, 0, 82);
+      border-radius: 10px;
+      border-style :outset;
+      border: 2px solid rgb(255, 0, 255);
+      padding: 10px;
+      margin: 10px;
+      box-shadow:  3px 3px 5px;
+      text-align: center;
+      width: 45%;            /* スマホでは1列 */
+      max-width: 800px;
+    
+    }
+    video {
+        border: 3px solid rgb(255, 6, 255); /* 太い線 */
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgb(255, 0, 255);
+        width: 80%;  /* 動画の幅をカード内で調整 */
+    }
+
+     /* 画面が768px以上のときは二列にする */
+    @media (min-width: 768px) {
+      .video-card .cinema-card {
+        width: 45%;           /* 横幅を45%にして二列表示 */
+      }
+    }
+  </style>
+</head>
+<body>
+  
+ <canvas id="stars"></canvas>
+  <canvas id="clouds"></canvas>
+  <canvas id="rain"></canvas>
+  <canvas id="lightning"></canvas>
+  <canvas id="flash"></canvas>
+
+
+<script>
+    function resizeCanvas(canvas) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    const starsCanvas = document.getElementById("stars");
+    const cloudsCanvas = document.getElementById("clouds");
+    const rainCanvas = document.getElementById("rain");
+    const lightningCanvas = document.getElementById("lightning");
+    const flashCanvas = document.getElementById("flash");
+    [starsCanvas, cloudsCanvas, rainCanvas, lightningCanvas, flashCanvas].forEach(resizeCanvas);
+    window.addEventListener("resize", () => {
+      [starsCanvas, cloudsCanvas, rainCanvas, lightningCanvas, flashCanvas].forEach(resizeCanvas);
+    });
+
+    /* === 星空 === */
+    const starsCtx = starsCanvas.getContext("2d");
+    let stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * starsCanvas.width,
+        y: Math.random() * starsCanvas.height,
+        radius: Math.random() * 1.5,
+        alpha: Math.random()
+      });
+    }
+    function drawStars() {
+      starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+      stars.forEach(star => {
+        starsCtx.beginPath();
+        starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        starsCtx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+        starsCtx.fill();
+        star.alpha += (Math.random() - 0.5) * 0.05;
+        if (star.alpha < 0.1) star.alpha = 0.1;
+        if (star.alpha > 1) star.alpha = 1;
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    /* === 雲 (パーティクル) === */
+    const cloudCtx = cloudsCanvas.getContext("2d");
+    let clouds = [];
+    for (let i = 0; i < 200; i++) {
+      clouds.push({
+        x: Math.random() * cloudsCanvas.width,
+        y: Math.random() * (cloudsCanvas.height / 2),
+        size: 50 + Math.random() * 150,
+        opacity: 0.05 + Math.random() * 0.1
+      });
+    }
+    let flashAlpha = 0;
+    function drawClouds() {
+      cloudCtx.clearRect(0, 0, cloudsCanvas.width, cloudsCanvas.height);
+      clouds.forEach(cloud => {
+        let brightness = 1 + flashAlpha * 1.5;
+        let r = 180 * brightness;
+        let g = 180 * brightness;
+        let b = 200 * brightness;
+        let gradient = cloudCtx.createRadialGradient(cloud.x, cloud.y, cloud.size * 0.3, cloud.x, cloud.y, cloud.size);
+        gradient.addColorStop(0, `rgba(${r},${g},${b},${cloud.opacity})`);
+        gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        cloudCtx.fillStyle = gradient;
+        cloudCtx.beginPath();
+        cloudCtx.arc(cloud.x, cloud.y, cloud.size, 0, Math.PI * 2);
+        cloudCtx.fill();
+      });
+      requestAnimationFrame(drawClouds);
+    }
+    drawClouds();
+
+    /* === 雨 === */
+  const rainCtx = rainCanvas.getContext("2d");
+let raindrops = [];
+let wind = 1.0;
+let targetWind = 1.5;
+
+for (let i = 0; i < 250; i++) {
+  raindrops.push({
+  x: Math.random() * rainCanvas.width,
+  y: Math.random() * rainCanvas.height,
+  length: 20 + Math.random() * 30, // 長さを少し伸ばす
+  speed: 10 + Math.random() * 8,   // 初期速度を大幅UP
+  vy: 0,
+  opacity: 0.25 + Math.random() * 0.3
+});
+}
+
+// 風をランダムに変化
+setInterval(() => {
+  targetWind = 0.5 + Math.random() * 4.0;
+}, 3000);
+
+function drawRain() {
+  rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+  rainCtx.lineWidth = 1.3;
+
+  // 🌬️ 風をスムーズに補間
+  wind += (targetWind - wind) * 0.02;
+
+  raindrops.forEach(drop => {
+    rainCtx.beginPath();
+    rainCtx.moveTo(drop.x, drop.y);
+
+    // 強風時 → 横流れを強調
+    const angleX = wind * 3;
+    const angleY = drop.length;
+
+    rainCtx.lineTo(drop.x - angleX, drop.y + angleY);
+
+    // 稲光で雨粒が照らされる
+    let brightness = drop.opacity + flashAlpha * 0.8;
+    rainCtx.strokeStyle = `rgba(200,220,255,${brightness})`;
+    rainCtx.stroke();
+
+    // 落下処理
+    drop.vy += 0.3;          // 重力加速度を強める（0.1 → 0.3）
+    drop.y += drop.speed + drop.vy;
+
+    // 🌬️ 横流れ (速い雨ほど風の影響を受ける)
+    drop.x -= wind * (0.5 + drop.speed * 0.2);
+
+    // 画面外に出たらリセット
+    if (drop.y > rainCanvas.height) {
+      drop.y = -20;
+      drop.x = Math.random() * rainCanvas.width;
+      drop.vy = 0; // リセット
+    }
+  });
+
+  requestAnimationFrame(drawRain);
+}
+drawRain();
+
+    /* === 稲妻 === */
+    const lightningCtx = lightningCanvas.getContext("2d");
+    let bolts = [];
+    function createLightning(x, y, length, segments) {
+      let points = [{x, y}];
+      for (let i = 0; i < segments; i++) {
+        x += (Math.random() - 0.5) * 50;
+        y += length / segments;
+        points.push({x, y});
+      }
+      return points;
+    }
+    function drawLightning() {
+      lightningCtx.clearRect(0, 0, lightningCanvas.width, lightningCanvas.height);
+      bolts.forEach((bolt, i) => {
+        lightningCtx.beginPath();
+        lightningCtx.moveTo(bolt.points[0].x, bolt.points[0].y);
+        for (let j = 1; j < bolt.points.length; j++) {
+          lightningCtx.lineTo(bolt.points[j].x, bolt.points[j].y);
+        }
+        lightningCtx.strokeStyle = `rgba(200,220,255,${bolt.alpha})`;
+        lightningCtx.lineWidth = 2;
+        lightningCtx.shadowBlur = 20;
+        lightningCtx.shadowColor = "rgba(200,220,255,0.8)";
+        lightningCtx.stroke();
+        bolt.alpha -= 0.02;
+        if (bolt.alpha <= 0) bolts.splice(i, 1);
+      });
+      requestAnimationFrame(drawLightning);
+    }
+    drawLightning();
+
+    function lightningStrike() {
+      const startX = Math.random() * lightningCanvas.width;
+      const startY = 0;
+      const points = createLightning(startX, startY, lightningCanvas.height, 20);
+      bolts.push({ points, alpha: 1.0 });
+      triggerFlash(startX, 100);
+    }
+    setInterval(lightningStrike, 4000 + Math.random() * 4000);
+
+    /* === フラッシュ === */
+    const flashCtx = flashCanvas.getContext("2d");
+    let flashX = 0, flashY = 0;
+    function triggerFlash(x, y) {
+      flashAlpha = 0.6;
+      flashX = x;
+      flashY = y;
+    }
+    function drawFlash() {
+      flashCtx.clearRect(0, 0, flashCanvas.width, flashCanvas.height);
+      if (flashAlpha > 0) {
+        let radius = Math.max(flashCanvas.width, flashCanvas.height);
+        let gradient = flashCtx.createRadialGradient(flashX, flashY, 0, flashX, flashY, radius);
+        gradient.addColorStop(0, `rgba(220,240,255,${flashAlpha})`);
+        gradient.addColorStop(0.3, `rgba(200,220,255,${flashAlpha * 0.4})`);
+        gradient.addColorStop(1, `rgba(180,200,255,0)`);
+        flashCtx.fillStyle = gradient;
+        flashCtx.fillRect(0, 0, flashCanvas.width, flashCanvas.height);
+        flashAlpha -= 0.01;
+      }
+      requestAnimationFrame(drawFlash);
+    }
+    drawFlash();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  <h1 class="glow">🎬Sho/Læ7ender EDIT VIDEO🎬</h1>
+
+<style>
+.glow {
+  font-size: 30px;
+  color: #f700ff;
+  animation: glowEffect 0.8s infinite alternate;
+}
+
+@keyframes glowEffect {
+  from {
+    text-shadow: 0 0 15px #ff00ff, 0 0 15px #ff00ff;
+  }
+  to {
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+  }
+}
+</style>
+
+      <h3 class="neon">EDITER</h3>
+
+       <div class="video-card">
+  <h2>Sho/The kQuick/Læ7ender🌙⚡</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0220.mov" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+  
+    <h3 class="neon">aespa EDIT</h3>
+ <style>
+    h3{
+        width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.1);
+        background-color: #000000;
+    }
+.neon {
+  font-size: 40px;
+  color: #ffffff;
+  text-shadow:
+    0 0 5px #0ff,
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    0 0 40px #0ff;
+}
+</style>
+ 
+
+        <div class="video-card">
+  <h2>aespa all members Re:</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0706(3).mp4" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+
+        <div class="video-card">   
+    <h2>savage x armageddon</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/1007 (2).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+          <div class="video-card">
+    <h2>aespa</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0714(1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+    
+    <div class="video-card">
+     <h2>aespa Dirty Work</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0629(1).mp4" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+
+        <div class="video-card">
+  <h2>aespa Work!!!</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0618(1).mp4" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+
+        <div class="video-card">   
+    <h2>aespa shak it to the max!</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0624(1).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+       <div class="video-card">   
+    <h2>MY memory</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0820(2).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+       <div class="video-card">   
+    <h2>aespa another worlds </h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0417ae.mov" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+   <div class="video-card">   
+    <h2>aespa KWANGYA ep2 </h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0829 (3)(1).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa KWANGYA ep3 </h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0830(2).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>Girls&naevis microwave edit </h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0919.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+ <div class="video-card">   
+    <h2>ae:aespa? Whiplash microwave edit</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0930.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+<div class="video-card">   
+    <h2>The aespa</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit Remake  ＊＊Н+3+ЯД＊＊7luCJIo0T6... (slowed + reverb).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+<div class="video-card">   
+    <h2>The aespa JPtext</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit Remake JPtext  ＊＊Н+3+ЯД＊＊7luCJIo0T6... (slowed + reverb).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+<div class="video-card">   
+    <h2>aespa Supernova!</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit BrooklynBloodPop.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>Live MY Life</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit everyday.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit drunk groove.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa funny&cute moment</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit Fluffing a Duck.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa ending fairy</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit LEGACY.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa's eyes</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit FUNKED UP.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>armageddon trailer</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit i can't do this.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa all members </h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit TORE UP.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit I'm God.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>aespa Hot Mess</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit ME!ME!ME!.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>Dark aespa</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit PRIVET PRIVET 2009-Slowed.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+     <div class="video-card">   
+    <h2>armageddon concept</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit Wıll Have My Revenge!.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>armageddon</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa armaggedon edit armaggdon.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+<div class="video-card">   
+    <h2>BAHAMA</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa edit BAHAMA.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+<div class="video-card">   
+    <h2>BLACKMAMBA～armageddon</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa KWANGYA～Armaggedon edit knights corpse (Slowed + Reverb).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="video-card">   
+    <h2>BLACKMAMBA～armageddon JPtext</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/aespa KWANGYA～Armaggedon JPtext edit knights corpse (Slowed + Reverb).mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+    <div class="cinema-card">   
+    <h2>aespa</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/1014.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+     <h7 class="hearttext">aespa KARINA💙</h7>
+</style>
+
+<style>
+h7{
+        width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 10px;
+       background-color: #000000; 
+       box-shadow: #000000  5 5 25px rgba(0, 0, 0, 0.1);
+    }
+.hearttext{
+  font-size: 40px;
+  color: #3700ff;
+  text-shadow:
+    0 0 5px rgb(82, 35, 255),
+    0 0 10px rgb(68, 35, 255),
+    0 0 20px rgb(63, 66, 255),
+    0 0 40px rgb(122, 99, 255);
+}
+</style>
+
+     <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0119.mov" type="video/mp4">
+      この動画は再生できません
+      
+    </video>
+    </div> 
+
+    <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0819 (2).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+        <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0820 (1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+     <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0823 (2).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0914.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+
+    </div>     <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Agora Hills.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0510.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit ALIBI.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Buck shots.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+    
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Dice and Roll.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Dead inside.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Gata Only.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Don't Go Insane.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+         <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit gimme more.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+            <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA Gata only.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+          <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit the lost soul down X Lost soul.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Satisfaction.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Passionfruitt.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit I Can't Do This.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card heart-section">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit pop like this pt2.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card ">
+    <h2>aespa Karina</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA edit Tuesday.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+    <script>
+    const heartTarget = document.querySelector('.heart-section');
+    let heartInterval;
+
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.innerText = "❤️"; // ハートの絵文字
+      heart.style.left = Math.random() * window.innerWidth + "px";
+      heart.style.fontSize = (20 + Math.random() * 40) + "px";
+      heart.style.animationDuration = (4 + Math.random() * 4) + "s";
+      document.body.appendChild(heart);
+
+      setTimeout(() => heart.remove(), 8000);
+    }
+
+    // セクションが見えたらハートを出す
+    const heart = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          heartInterval = setInterval(createHeart, 300); // 0.3秒ごとにハート
+        } else {
+          clearInterval(heartInterval);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    heart.observe(heartTarget);
+  </script>
+
+   
+
+  <h6 class="moontext" id="giselle-anchor">aespa GISELLE🌙</h6>
+
+<style>
+
+h6{
+        width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 10px;
+         background-color: #000000; 
+        box-shadow: #000000  5 5 25px rgba(0, 0, 0, 0.1); 
+      
+}
+
+
+.moontext {
+  font-size: 40px;
+  color: #ff00d4;
+  text-shadow:
+    0 0 5px rgb(236, 80, 250),
+    0 0 10px rgb(250, 104, 255),
+    0 0 20px rgb(250, 95, 255),
+    0 0 40px rgb(255, 127, 255);
+}
+</style>
+
+
+           <div class="video-card">
+    <h2>aespa Giselle</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0225.mov" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+
+     <div id="stars"></div>
+      <section id="night-section"></section>
+
+ <div class="video-card">
+     <h2>aespa Giselle</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0502.mp4" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE(comic) edit cleared.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/1220.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0819.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0923.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit BLINK.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit CLEARED - Remix.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit Buck Shots.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit FASHION.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit love potions.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit Make you mine (2).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa Giselle edit SAD GIRLZ LUV MONEY.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit SYNK.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE edit the coast.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+       <div class="video-card">
+    <h2>aespa Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GSELLE edit Gentleman.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+  
+    <script>
+    const nightSection = document.querySelector("#night-section");
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.body.classList.add("night");
+        } else {
+          document.body.classList.remove("night");
+        }
+      });
+    }, { threshold: 0.5 }); // 50%以上見えたら切り替え
+
+    observer.observe(nightSection);
+  </script>
+    
+<h4 class="snowy" id="winter-anchor">aespa WINTER⭐</h4>
+  
+</style>
+  <style>
+
+
+h4{
+        width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 10px;
+         background-color: #000000; 
+       box-shadow: #000000  5 5 25px rgba(0, 0, 0, 0.1);
+    }
+.snowy {
+  font-size: 40px;
+  color: #ffffff;
+  text-shadow:
+    0 0 5px #0ff,
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    0 0 40px #0ff;
+}
+</style>
+
+
+
+       <div class="video-card snow-section">
+  <h2>aespa Winter</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0119 (1).mov" type="video/mp4">
+    この動画は再生できません
+  </video>
+ </div>
+      
+    <div class="video-card snow-section">
+  <h2>aespa Winter</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0519.mp4" type="video/mp4">
+    この動画は再生できません
+  </video>
+    </div>
+   
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/1224(1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+ 
+
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0907 (1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+     
+        <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0905.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+ 
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit 9mm.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+    
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Confident.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit CLOUDS.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+  
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit dazies.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>  
+   
+     
+       <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Dice and Roll.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+    
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit FAVORITE (2).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Don't Stop The Music.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Let it Burn.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit love nwantiti.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Ride or die.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Looking at me.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+ 
+   <div class="video-card snow-section">
+    <h2>aespa Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa WINTER edit Farben.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+    
+<script>
+    const snowTarget = document.querySelector('.snow-section');
+    let snowInterval;
+
+    function createsnow() {
+      const snow = document.createElement("div");
+      snow.className = "snow";
+      snow.innerText = "❄"; // 雪の絵文字
+      snow.style.left = Math.random() * window.innerWidth + "px";
+      snow.style.fontSize = (5 + Math.random() * 40) + "px";
+      snow.style.animationDuration = (3+ Math.random() * 10) + "s";
+      document.body.appendChild(snow);
+
+      setTimeout(() => snow.remove(), 8000);
+    }
+
+    // セクションが見えたら雪を出す
+    const snow = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          snowInterval = setInterval(createsnow, 300); // 0.3秒ごとに雪
+        } else {
+          clearInterval(snowInterval);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    snow.observe(snowTarget);
+  </script>
+
+     <h5 class="butterflytext">aespa NINGNING🦋</h5>
+</style>
+<style>
+h5{
+        width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 10px;
+         background-color: #000000; 
+       box-shadow: #000000  5 5 25px rgba(0, 0, 0, 0.1);
+    }
+.butterflytext {
+  font-size: 40px;
+  color: purple;
+  text-shadow:
+    0 0 5px rgb(110, 0, 161),
+    0 0 10px rgb(100, 0, 158),
+    0 0 20px rgb(133, 0, 173),
+    0 0 40px rgb(147, 0, 184);
+}
+</style>
+    
+    <section class="butterfly-section"></section>
+        <div class="video-card">   
+    <h2>aespa Ningning</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0217(1).mov" type="video/mp4">
+    この動画は再生できません
+  </video> 
+</div>
+
+        <div class="video-card">   
+    <h2>aespa Ningning</h2>
+  <video controls width="600">
+    <source src="Edit videos and scenepacks/edit/0823.mp4" type="video/mp4">
+    この動画は再生できません
+  </video> 
+    </div>
+
+   <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0928.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0825 (1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0819 (1)(1).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0817.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0903.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit more than ever.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit Intoxicated (Slowed).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit wutiwant.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit 7 rings.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit Got a Buzz.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit Desire.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit BigBoy.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NINGNING edit 104.5 Sky Fm.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+
+
+ <div class="video-card">
+    <h2>aespa Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa NIGNING edit mindgame.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+    <script>
+    const butterflySection = document.querySelector(".butterfly-section");
+    let butterflyInterval = null;
+
+    function createButterfly() {
+      const butterfly = document.createElement("div");
+      butterfly.classList.add("butterfly");
+      butterfly.textContent = "🦋";
+
+      // ランダムな位置とサイズ
+      butterfly.style.top = Math.random() * window.innerHeight + "px";
+      butterfly.style.left = "0px";
+      butterfly.style.fontSize = (1 + Math.random() *5) + "rem";
+      butterfly.style.animationDuration = (3+ Math.random() * 10) + "s";
+
+      butterflySection.appendChild(butterfly);
+
+      // 一定時間で削除
+      setTimeout(() => butterfly.remove(), 6000);
+    }
+
+    // セクション監視（背景は変えない）
+    const butterflyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!butterflyInterval) {
+            butterflyInterval = setInterval(createButterfly, 1000);
+          }
+        } else {
+          clearInterval(butterflyInterval);
+          butterflyInterval = null;
+        }
+      });
+    }, { threshold: 0.1 });
+
+    butterflyObserver.observe(butterflySection);
+  </script>
+
+  <h3 class="neon">aespa Duo </h3>
+
+ <div class="video-card">
+    <h2>aespa Karina and Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/1007 (3).mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+ <div class="video-card">
+    <h2>aespa Giselle and Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/0119 (2).mov" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+ <div class="video-card">
+    <h2>aespa Giselle and Winter</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/1007.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+ <div class="video-card">
+    <h2>aespa Karina and Ningning</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/1009.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+     <div class="video-card">
+    <h2>aespa Karina and Giselle</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa KARINA & GISELLE edit i can't do this.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+     <div class="video-card">
+    <h2>aespa Giselle and JEON SOMI</h2>
+    <video controls="600">
+      <source src="Edit videos and scenepacks/edit/aespa GISELLE and JEON SOMI edit Kill Bill.mp4" type="video/mp4">
+      この動画は再生できません
+    </video>
+    </div>
+
+    
+
+</body> 
+</html>
+
+
+
+
